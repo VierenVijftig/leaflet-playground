@@ -41,8 +41,41 @@ $( document ).ready(function() {
 	
 	L.control.layers(baseMaps).addTo(map);
 
+	map.on('load', onMapMove);
+	map.on('moveend', onMapMove);
+
 	
 });
+
+function onMapMove(){
+	//Called when the map is moved
+	var bounds = map.getBounds(); //this is an object of type latLngBounds http://leafletjs.com/reference.html#latlngbounds
+	var minLat = bounds.getSouth();
+	var minLon = bounds.getWest();
+	var maxLat = bounds.getNorth();
+	var maxLon = bounds.getEast();
+	//Load from OSM API OverPass
+	var queryRecycling = 'http://overpass-api.de/api/interpreter?data=[out:json];node[amenity=recycling]('+ minLat +','+ minLon +','+ maxLat +','+ maxLon +');out;';
+	$.getJSON(queryRecycling, function(data){
+		//Debug
+		// console.log(data);
+		for (var i = data.elements.length - 1; i >= 0; i--) {
+			e = data.elements[i]; //each "e" is a element returned from the query 
+			//The icon
+			 var greenIcon = L.AwesomeMarkers.icon({
+    			icon: 'recycle',
+    			prefix: 'fa', //use ony for font-awesome icon
+    			markerColor: 'green'
+  			});
+			//The popup content
+			var popupContent = '<p>id: '+e.id+'<br>amenity:'+ e.tags.amenity+'</p>'
+  			var marker = L.marker([e.lat,e.lon], {icon: greenIcon}).addTo(map);
+  			marker.bindPopup(popupContent).openPopup();
+
+		};
+
+	});
+}
 
 $('#address').keyup(function(event) {
 	event.preventDefault();
@@ -51,7 +84,6 @@ $('#address').keyup(function(event) {
 		addr_search();
 	}
 	return false;
-
 });
 
 $('#button-go').click(function(event) {
@@ -61,7 +93,6 @@ $('#button-go').click(function(event) {
 	if (searchString.length > 0) { 
 		addr_search();
 	};
-
 });
 
 
@@ -73,14 +104,14 @@ function addr_search() {
 		var items = [];
 
 		$.each(data, function(key, val) {
-	//Debug
-	console.log(val.display_name);
+		//Debug
+		console.log(val.display_name);
 
-	items.push(
-		"<li><a href='#' onclick='chooseAddr(" +
-			val.lat + ", " + val.lon + ");return false;'>" + val.display_name +
-	'</a></li>'
-	)});
+		items.push(
+			"<li><a href='#' onclick='chooseAddr(" +
+				val.lat + ", " + val.lon + ");return false;'>" + val.display_name +
+		'</a></li>'
+		)});
 
 		$('#results').empty();
 		if (items.length != 0) {
@@ -94,7 +125,6 @@ function addr_search() {
 		}
 	});
 }
-
 
 
 function chooseAddr(lat, lng, type) {
