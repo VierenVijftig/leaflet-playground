@@ -38,14 +38,47 @@ $( document ).ready(function() {
 		"OpenStreetMap": osm
 	};
 
-	
 	L.control.layers(baseMaps).addTo(map);
 
+	//Add the Locate control
+	// L.control.locate().addTo(map);
+
+	//Add the callbacks to load data from OSM API (Overpass)
 	map.on('load', onMapMove);
 	map.on('moveend', onMapMove);
 
+	//Locate the user
+	locateUser();
+
 	
 });
+
+function locateUser(){
+	    map.locate({setView: true, watch: true}) /* This will return map so you can do chaining */
+        .on('locationfound', function(e){
+        		
+    		//Remove all markers
+    		markers.forEach(function(entry){
+				// var marker = map.getLayer(entry);
+				map.removeLayer(entry);
+			});
+
+            var marker = L.marker([e.latitude, e.longitude]).bindPopup('Your location');
+            markers[marker._leaflet_id] = marker;
+            var circle = L.circle([e.latitude, e.longitude], e.accuracy/2, {
+                weight: 1,
+                color: 'blue',
+                fillColor: '#cacaca',
+                fillOpacity: 0.2
+            });
+            map.addLayer(marker);
+            map.addLayer(circle);
+        })
+       .on('locationerror', function(e){
+            console.log(e);
+            // alert("Location access denied.");
+        });
+}
 
 function onMapMove(){
 	//Called when the map is moved
@@ -59,6 +92,13 @@ function onMapMove(){
 	$.getJSON(queryRecycling, function(data){
 		//Debug
 		// console.log(data);
+
+		//Remove all markers
+		markers.forEach(function(entry){
+			// var marker = map.getLayer(entry);
+			map.removeLayer(entry);
+		});
+
 		for (var i = data.elements.length - 1; i >= 0; i--) {
 			e = data.elements[i]; //each "e" is a element returned from the query 
 			//The icon
@@ -70,6 +110,7 @@ function onMapMove(){
 			//The popup content
 			var popupContent = '<p>id: '+e.id+'<br>amenity:'+ e.tags.amenity+'</p>'
   			var marker = L.marker([e.lat,e.lon], {icon: greenIcon}).addTo(map);
+  			markers[marker._leaflet_id] = marker;
   			marker.bindPopup(popupContent).openPopup();
 
 		};
