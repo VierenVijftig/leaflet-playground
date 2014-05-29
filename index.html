@@ -21,11 +21,12 @@
         <!-- Leaflet -->
     <!-- <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" /> -->
     <link rel="stylesheet" href="leaflet-0.7.3/leaflet.css" />
-    <!-- Locate plugin -->
-    <link rel="stylesheet" href="leaflet-locatecontrol/src/L.Control.Locate.css" />
     <!-- awesome markers for leaflet (requires FontAwesome) -->
+    <!-- Load Awesome Markers BEFORE Locate plugin!! -->
     <link rel="stylesheet" href="font-awesome-4.1.0/css/font-awesome.min.css" />
     <link rel="stylesheet" href="awesome-markers/leaflet.awesome-markers.css" />
+    <!-- Locate plugin -->
+    <link rel="stylesheet" href="leaflet-locatecontrol/src/L.Control.Locate.css" />
     <!-- my stylesheet -->
     <link rel="stylesheet" href="map.css" />
 
@@ -116,10 +117,11 @@
     <!-- Leaflet -->
     <!-- <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>  -->
     <script src="leaflet-0.7.3/leaflet.js"></script> 
-    <!-- Locate plugin -->
-    <script src="leaflet-locatecontrol/src/L.Control.Locate.js"></script>
     <!-- Awesome Markers for Leaflet -->
-    <script type="text/javascript" src="awesome-markers/leaflet.awesome-markers.js"></script>
+    <!-- Load Awesome Markers BEFORE Locate control!! -->
+    <script src="awesome-markers/leaflet.awesome-markers.min.js"></script>
+    <!-- Locate plugin -->
+    <script src="leaflet-locatecontrol/src/L.Control.Locate.js"></script>    
     <!-- leaflet OSM plugin -->
     <!-- <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-osm/v0.1.0/leaflet-osm.js'></script> -->
     <!-- my code -->

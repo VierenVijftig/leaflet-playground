@@ -41,7 +41,7 @@ $( document ).ready(function() {
 	L.control.layers(baseMaps).addTo(map);
 
 	//Add the Locate control
-	// L.control.locate().addTo(map);
+	L.control.locate().addTo(map);
 
 	//Add the callbacks to load data from OSM API (Overpass)
 	map.on('load', onMapMove);
@@ -105,7 +105,8 @@ function onMapMove(){
 			 var greenIcon = L.AwesomeMarkers.icon({
     			icon: 'recycle',
     			prefix: 'fa', //use ony for font-awesome icon
-    			markerColor: 'green'
+    			markerColor: 'green',
+    			iconColor: 'white'
   			});
 			//The popup content
 			var popupContent = '<p>id: '+e.id+'<br>amenity:'+ e.tags.amenity+'</p>'
