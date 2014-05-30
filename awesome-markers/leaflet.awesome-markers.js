@@ -56,7 +56,7 @@
         },
 
         _createInner: function() {
-            var iconClass, iconSpinClass = "", iconColorClass = "", iconColorStyle = "", options = this.options;
+            var iconClass, iconSpinClass = "", iconColorClass = "", iconColorStyle = "", iconUrl="", options = this.options;
 
             if(options.icon.slice(0,options.prefix.length+1) === options.prefix + "fa ") {
                 iconClass = options.icon;
@@ -76,7 +76,11 @@
                 }
             }
 
-            return "<i " + iconColorStyle + "class='" + options.extraClasses + " " + options.prefix + " " + iconClass + " " + iconSpinClass + " " + iconColorClass + "'></i>";
+            if (options.iconUrl) {
+                iconUrl = '<img src="'+options.iconUrl+'" width="20px">';
+            };
+
+            return "<i " + iconColorStyle + "class='" + options.extraClasses + " " + options.prefix + " " + iconClass + " " + iconSpinClass + " " + iconColorClass + "'>"+iconUrl+"</i>";
         },
 
         _setIconStyles: function (img, name) {
