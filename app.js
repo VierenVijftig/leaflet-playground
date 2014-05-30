@@ -1,6 +1,7 @@
 //The Map
 var map;
 var markers = new Array();
+var currentQuery = '';
 
 $( document ).ready(function() {
 
@@ -11,11 +12,7 @@ $( document ).ready(function() {
 	mbUrl = 'https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png';
 	mb = new L.tileLayer(mbUrl,  {id: 'examples.map-i86knfo3', attribution: mbAttr, maxZoom: 18});
 
-	// L.tileLayer(, {
-	//     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-	//     maxZoom: 18
-	// }).addTo(map);
-	//end MapQuest
+	var AMSTERDAM = [52.373056, 4.892222];
 
 	//To use OpenStreetMap
 	var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -25,10 +22,10 @@ $( document ).ready(function() {
 	// map.setView(new L.LatLng(51.538594, -0.198075), 12).addLayer(osm);
 	//End OpenStreetMap
 
-	map = L.map('map', {layers: [mb, osm]}).setView([45.54155, 10.21180], 13);
+	map = L.map('map', {layers: [mb, osm]}).setView(AMSTERDAM, 13);
 
 	//Add a marker
-	var marker = L.marker([45.54155, 10.21180]);	
+	var marker = L.marker(AMSTERDAM);	
 	map.addLayer(marker);
 	markers[marker._leaflet_id] = marker;
 
@@ -43,9 +40,10 @@ $( document ).ready(function() {
 	//Add the Locate control
 	L.control.locate().addTo(map);
 
-	//Add the callbacks to load data from OSM API (Overpass)
-	map.on('load', onMapMove);
-	map.on('moveend', onMapMove);
+	// //Add the callbacks to load data from OSM API (Overpass)
+	// map.on('load', onMapMove);
+	// map.on('moveend', onMapMove);
+	map.on('moveend', loadQuery);
 
 	//Locate the user
 	locateUser();
@@ -187,3 +185,76 @@ function chooseAddr(lat, lng, type) {
 		map.setZoom(13);
 	}
 }
+
+function loadQuery(query){
+	baseUrl = 'http://api.citysdk.waag.org/admr.nl.amsterdam/';
+	var icon;
+	if (query=='bike-park') {
+		queryStr = baseUrl+'nodes?layer=divv.parking.bicycles&per_page=100';
+		icon = L.AwesomeMarkers.icon({
+		iconUrl: 'icons/bicycle.png',
+		iconRetinaUrl: 'icons/bicycle.png',
+		markerColor: 'red',
+		iconColor: 'white'
+		});
+	}
+	else if(query=='car-park'){
+		queryStr = baseUrl+'nodes?layer=divv.parking.car&per_page=100';
+		icon = L.AwesomeMarkers.icon({
+		prefix: 'fa',
+		icon: 'fa-car',
+		markerColor: 'red',
+		iconColor: 'white'
+		});
+	}
+	else{
+		return false;
+	}
+	queryStr = queryStr + "&geom";
+
+	$.getJSON(queryStr, function(data){
+		//Debug
+		console.log(data);
+
+		//Remove all markers
+		markers.forEach(function(entry){
+			// var marker = map.getLayer(entry);
+			map.removeLayer(entry);
+		});
+
+		for (var i = data.results.length - 1; i >= 0; i--) {
+			result = data.results[i];
+			name = result.name;
+			coordinates = result.geom.coordinates;
+			var lat = coordinates[1];
+			var lon = coordinates[0];
+
+
+			//The popup content
+			var popupContent = '<p>'+result.name+'</p>'
+  			var marker = L.marker([lat, lon], {icon: icon}).addTo(map);
+  			markers[marker._leaflet_id] = marker;
+  			marker.bindPopup(popupContent);
+
+		};
+
+	});
+
+}
+
+//Buttons
+
+$('#car-park').click(function(event) {
+	//User tapped to get the bike parkings
+	event.preventDefault();
+	currentQuery = 'car-park';
+	loadQuery('car-park');
+});
+
+$('#bike-park').click(function(event) {
+	//User tapped to get the bike parkings
+	event.preventDefault();
+	currentQuery = 'bike-park';
+	loadQuery('bike-park');
+
+});
