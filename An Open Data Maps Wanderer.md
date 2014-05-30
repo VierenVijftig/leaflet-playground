@@ -35,12 +35,12 @@ In the case of geographical data, we have two types of data:
 
 Let's move deeper in putting all the pieces on the board. I will cover the following:
 
- 1. Leaflet
- 2. OpenStreetMap
- 3. Overpass
- 4. OpenLayers
+ 1. [Leaflet][5]
+ 2. [OpenStreetMap][6]
+ 3. [Overpass API][7]
+ 4. [OpenLayers][8]
  5. MapQuest
- 6. MapBox
+ 6. [MapBox][9]
 
 As the most knowledgeable people may have noticed, I am mixing up various kinds of tools and services, but they represent the pieces of the puzzle we need to put together in order to achieve our goals of obtaining the desired information, so please bear with me. 
   
@@ -51,7 +51,7 @@ Leaflet is a Javascript library for displaying a map in a HTML page and working 
 
 OpenStreetMap
 ------------
-OpenStreetMap is a project to create a "wiki" map of the world. This project is ran by the OpenStreetMap Foundation. The OpenStreetMap database is a source for both Points of Interest and tiles, and it is made accessible to end-users through the portal [OpenStreetMap.org.][5], but the entire database can be [downloaded][6] on your hard drive (if you know what to do with it). 
+OpenStreetMap is a project to create a "wiki" map of the world. This project is ran by the OpenStreetMap Foundation. The OpenStreetMap database is a source for both Points of Interest and tiles, and it is made accessible to end-users through the portal [OpenStreetMap.org.][10], but the entire database can be [downloaded][11] on your hard drive (if you know what to do with it). 
 OpenStreetMap data is more useful if made available through certain APIs, such as OverPass API. 
 
 Overpass API
@@ -89,5 +89,10 @@ This is harder. Say that you have information about locations provided by Google
   [2]: http://maps.bing.com
   [3]: https://developers.google.com/maps/licensing
   [4]: https://developers.google.com/maps/terms?hl=en
-  [5]: www.OpenStreetMap.org.
-  [6]: http://planet.openstreetmap.org/
+  [5]: http://leafletjs.com/
+  [6]: http://www.openstreetmap.org/
+  [7]: http://overpass-api.de/
+  [8]: http://openlayers.org/
+  [9]: https://www.mapbox.com/
+  [10]: www.OpenStreetMap.org.
+  [11]: http://planet.openstreetmap.org/
