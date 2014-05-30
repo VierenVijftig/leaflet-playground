@@ -112,7 +112,7 @@ function onMapMove(){
 			var popupContent = '<p>id: '+e.id+'<br>amenity:'+ e.tags.amenity+'</p>'
   			var marker = L.marker([e.lat,e.lon], {icon: greenIcon}).addTo(map);
   			markers[marker._leaflet_id] = marker;
-  			marker.bindPopup(popupContent).openPopup();
+  			marker.bindPopup(popupContent);
 
 		};
 
