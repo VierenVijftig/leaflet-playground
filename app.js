@@ -2,6 +2,7 @@
 var map;
 var markers = new Array();
 var currentQuery = '';
+var cdkLayer;
 
 $( document ).ready(function() {
 
@@ -48,8 +49,113 @@ $( document ).ready(function() {
 	//Locate the user
 	locateUser();
 
+
+	//This code from Waag
+
+    var lineStyle = {
+      color: "#CE2027",
+      weight: 3,
+      opacity: 0.90
+    };
+
+    function onFeatureClick(e) {
+      feature = e.target.feature;
+      // setNodeData(feature.properties);
+      // alert(feature.properties);
+      
+    }
+
+    function onEachFeature(feature, layer) {
+      // layer.on('click', onFeatureClick);
+      var popupContent = JSON.stringify(feature.properties, undefined, 2);
+      layer.bindPopup(popupContent);
+    }
+
+    cdkLayer = new L.geoJson(null, {
+      style: lineStyle,
+      onEachFeature: onEachFeature,
+      pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, pointStyle);
+      }
+    }).addTo(map);
+
+    //End Waag code
+
+    getBorders();
+
 	
 });
+
+function getBorders(){
+
+	var url = "http://api.citysdk.waag.org/admr.nl.amsterdam/nodes?admr::admn_level=5&layer=osm&per_page=200&geom=true";
+	 $.getJSON(url, function(data) {
+        // If data is returned, and data.results.length > 0,
+        // add URL to urlHistory
+
+         for (var i = 0; i < data.results.length; i++) {
+           var node = data.results[i];
+
+           if(node.geom) {
+             var geom = node.geom
+             delete node["geom"];
+             var feature = {
+               type: "Feature",
+               properties: node,
+               geometry: geom
+             };
+           } else if(node.bbox) {
+             var geom = node.bbox
+             delete node["bbox"];
+             var feature = {
+               type: "Feature",
+               properties: node,
+               geometry: geom
+             };
+
+           } else {
+             continue;
+           }
+           cdkLayer.addData(feature);
+         }
+         // formatResult(data);
+
+         // spinner.stop();
+
+         // /*
+         // We want to fit all the data on the map.
+         // Normally, map.fitBounds(cdkLayer.getBounds())
+         // would do. But the floatbox is obscuring part
+         // of the map.
+         // We must calculate the bounds of the data
+         // and resize the width to include floatbox width
+         // */
+
+         // var dataBounds = cdkLayer.getBounds();
+         // var southWest = dataBounds.getSouthWest();
+         // var northEast = dataBounds.getNorthEast();
+         // // TODO: Dit is dus NIET goed. Ik moet hier nog 'ns even goed over na gaan denken. Nu naar bed. Daag!
+
+         // var lngScale = $("#map").width() / (($("#map").width() - ($("#floatbox").width() + 30)));
+
+         // map.fitBounds([
+         //     [southWest.lat, southWest.lng],
+         //     [northEast.lat, (northEast.lng - southWest.lng) * lngScale + southWest.lng]
+         // ]);
+
+       }).fail(function(e) {
+         if(e.responseText)
+		   {
+		   		var data = $.parseJSON(e.responseText);
+               	formatResult(data)
+             }
+		   else
+		   {
+		   		alert("unknown error");
+				// $('#nodedata').html("unknown error (maybe server is unavailable / maybe the requested was not formatted correctly)")
+		   }
+     });
+}
 
 function locateUser(){
 	    map.locate({setView: true, watch: true}) /* This will return map so you can do chaining */
@@ -192,8 +298,8 @@ function loadQuery(query){
 	if (query=='bike-park') {
 		queryStr = baseUrl+'nodes?layer=divv.parking.bicycles&per_page=100';
 		icon = L.AwesomeMarkers.icon({
-		iconUrl: 'icons/bicycle.png',
-		iconRetinaUrl: 'icons/bicycle.png',
+		iconUrl: 'icons/bicycle.svg',
+		iconRetinaUrl: 'icons/bicycle@2x.svg',
 		markerColor: 'red',
 		iconColor: 'white'
 		});
