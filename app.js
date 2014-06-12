@@ -3,6 +3,7 @@ var map;
 var markers = new Array();
 var currentQuery = '';
 var cdkLayer;
+var cdkFeatureGroup;
 
 $( document ).ready(function() {
 
@@ -38,6 +39,9 @@ $( document ).ready(function() {
 
 	L.control.layers(baseMaps).addTo(map);
 
+	//Add the cdk FeatureGroup
+	cdkFeatureGroup = new L.LayerGroup(Array()).addTo(map);
+
 	//Add the Locate control
 	L.control.locate().addTo(map);
 
@@ -52,27 +56,19 @@ $( document ).ready(function() {
 
 	//This code from Waag
 
-    var lineStyle = {
-      color: "#CE2027",
-      weight: 3,
-      opacity: 0.90
-    };
+    // var lineStyle = {
+    //   color: randomColor(),
+    //   weight: 3,
+    //   opacity: 0.90
+    // };
 
-    function onFeatureClick(e) {
-      feature = e.target.feature;
-      // setNodeData(feature.properties);
-      // alert(feature.properties);
-      
-    }
+    map.on('click', function(e) {
+    	addBouncingMarker(e.latlng);
+	});
 
-    function onEachFeature(feature, layer) {
-      // layer.on('click', onFeatureClick);
-      var popupContent = JSON.stringify(feature.properties, undefined, 2);
-      layer.bindPopup(popupContent);
-    }
 
     cdkLayer = new L.geoJson(null, {
-      style: lineStyle,
+      style: lineStyle(),
       onEachFeature: onEachFeature,
       pointToLayer: function (feature, latlng) {
         return L.circleMarker(latlng, pointStyle);
@@ -85,6 +81,32 @@ $( document ).ready(function() {
 
 	
 });
+
+function onFeatureClick(e) {
+  feature = e.target.feature;
+  // setNodeData(feature.properties);
+  // alert(feature.properties);
+  
+}
+
+function onEachFeature(feature, layer) {
+  // layer.on('click', onFeatureClick);
+  var popupContent = JSON.stringify(feature.properties, undefined, 2);
+  layer.bindPopup(popupContent);
+}
+
+function randomColor(){
+	return '#'+Math.floor(Math.random()*16777215).toString(16);
+}
+
+function lineStyle(){
+	var lineStyle = {
+      color: randomColor(),
+      weight: 3,
+      opacity: 0.90
+	};
+return lineStyle;
+}
 
 function getBorders(){
 
@@ -116,7 +138,17 @@ function getBorders(){
            } else {
              continue;
            }
-           cdkLayer.addData(feature);
+           // cdkLayer.addData(feature);
+
+         	cdkL = new L.geoJson(feature, {
+      			style: lineStyle(),
+      			onEachFeature: onEachFeature,
+      			pointToLayer: function (feature, latlng) {
+    			return L.circleMarker(latlng, pointStyle);
+      		}
+    		});
+    		cdkFeatureGroup.addLayer(cdkL);
+
          }
          // formatResult(data);
 
@@ -155,6 +187,36 @@ function getBorders(){
 				// $('#nodedata').html("unknown error (maybe server is unavailable / maybe the requested was not formatted correctly)")
 		   }
      });
+}
+
+function addBouncingMarker(latlng)
+{
+	var bouncingMarker = L.marker(latlng, 
+	{ 	
+		riseOnHover: true,
+		riseOffset: 300,
+		bounceOnAdd: true, 
+		bounceOnAddOptions: {duration: 500, height: 100}, 
+		bounceOnAddCallback: function() {
+			// console.log("done");
+			// bouncingMarker.animate({opacity: 0.25,width: "70%"}, {
+			// 	queue: false,
+			// 	duration: 3000
+			// });
+			newLatLng = latlng;
+			newLatLng.lat = latlng.lat+0.001;
+			
+			var myInt=setInterval(function(){
+			bouncingMarker.setLatLng(newLatLng);
+			var myInt2=setInterval(function(){
+				// map.removeLayer(bouncingMarker);	
+			},1000);
+			window.clearInterval(myInt);
+			},1000);
+
+
+		}
+	}).addTo(map);
 }
 
 function locateUser(){
