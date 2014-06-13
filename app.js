@@ -191,32 +191,59 @@ function getBorders(){
 
 function addBouncingMarker(latlng)
 {
-	var bouncingMarker = L.marker(latlng, 
-	{ 	
-		riseOnHover: true,
-		riseOffset: 300,
-		bounceOnAdd: true, 
-		bounceOnAddOptions: {duration: 500, height: 100}, 
-		bounceOnAddCallback: function() {
-			// console.log("done");
-			// bouncingMarker.animate({opacity: 0.25,width: "70%"}, {
-			// 	queue: false,
-			// 	duration: 3000
-			// });
-			newLatLng = latlng;
-			newLatLng.lat = latlng.lat+0.001;
+	var newLatLng1 = L.latLng(latlng.lat, latlng.lng);
+	var newLatLng2 = L.latLng(latlng.lat, latlng.lng);
+	newLatLng1.lat = latlng.lat + 0.015;
+	newLatLng2.lat = latlng.lat + 0.03;
+
+
+	var line = L.polyline([latlng, newLatLng1, newLatLng2]);
+
+
+	var marker = L.animatedMarker(line.getLatLngs(), {
+      onEnd: function() {
+        $(this._shadow).fadeOut();
+        $(this._icon).fadeOut(3000, function(){
+          map.removeLayer(this);
+        });
+      }});
+
+	// var animatedMarker = L.animatedMarker(line.getLatLngs(), {
+ //  		onEnd: function() {
+ //    	// TODO: blow up this marker
+ //    	map.removeLayer(animatedMarker);
+ //  		}
+ //  	});
+	map.addLayer(marker);
+
+	// var bouncingMarker = L.marker(latlng, 
+	// { 	
+	// 	riseOnHover: true,
+	// 	riseOffset: 300,
+	// 	bounceOnAdd: true, 
+	// 	bounceOnAddOptions: {duration: 500, height: 100}, 
+	// 	bounceOnAddCallback: function() {
+	// 		// console.log("done");
+	// 		// bouncingMarker.animate({opacity: 0.25,width: "70%"}, {
+	// 		// 	queue: false,
+	// 		// 	duration: 3000
+	// 		// });
+	// 		newLatLng = latlng;
+	// 		newLatLng.lat = latlng.lat+0.003;
+
+
 			
-			var myInt=setInterval(function(){
-			bouncingMarker.setLatLng(newLatLng);
-			var myInt2=setInterval(function(){
-				// map.removeLayer(bouncingMarker);	
-			},1000);
-			window.clearInterval(myInt);
-			},1000);
+	// 		var myInt=setInterval(function(){
+	// 		bouncingMarker.setLatLng(newLatLng);
+	// 		var myInt2=setInterval(function(){
+	// 			// map.removeLayer(bouncingMarker);	
+	// 		},1000);
+	// 		window.clearInterval(myInt);
+	// 		},1000);
 
 
-		}
-	}).addTo(map);
+	// 	}
+	// }).addTo(map);
 }
 
 function locateUser(){
