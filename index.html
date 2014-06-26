@@ -52,9 +52,23 @@
       </div>
 
       <div class="row marketing">
+        <div class="col-lg-6 pull-left">
+          <div class="input-group">
+            <select id="select-hashtag">
+              <option value="vondelpark">#vondelpark</option>
+              <option value="zwerfie">#zwerfie</option>
+              <option value="weownthenight">#weownthenight</option>
+              <option value="food">#food</option>
+              <option value="fun">#fun</option>
+              <option value="schiphol">#schiphol</option>
+            </select>
+            
+          </div><!-- /input-group -->
+        </div><!-- /.col-lg-6 -->
+
         <div class="col-lg-6 pull-right">
           <div class="input-group">
-            <input type="text" class="form-control" id="address">
+            <input type="text" class="form-control" id="address" placeholder="Search for a location...">
             <span class="input-group-btn">
               <button class="btn btn-default" id="button-go" type="button">Go!</button>
             </span>
@@ -69,59 +83,19 @@
         <div id="map"></div>
       </div>
 
+      <div class="jumbotron">
+        <p>
+          This map shows the locations of geotagged tweets from 02/06/2014 to 25/06/2014 for the selected #hashtag.
+        </p>
+      </div>
+
       <!-- <div class="jumbotron">
         <h1>Jumbotron</h1>
         <p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
         <p><a class="btn btn-lg btn-success" href="#" role="button">Sign up today</a></p>
       </div> -->
 
-      <div class="row marketing">
-        <div class="col-lg-6">
-          <h4>Ik heb een auto</h4>
-          <p>
-            <ul>
-              <li><a href="#" id="car-park">Waar can ik park?</a></li>
-              <li><a href="#" id="car-park-cost">How much does parking cost?</a></li>
-              <li><a href="http://23.251.139.138/" id="car-idee">Ik heb een idee</a></li>
-            </ul>
-          </p>
-
-          <h4>Ik heb een fiets</h4>
-          <p>
-            <ul>
-              <li><a href="#" id="bike-park">Waar can ik park?</a></li>
-              <li><a href="http://23.251.139.138/" id="bike-idee">Ik heb een idee</a></li>
-              
-            </ul>
-          </p>
-
-          <h4>Ik ben een student</h4>
-          <p>
-            <ul>
-              <li><a href="#" id="libraries">Waar can ik studeer?</a></li>
-              
-            </ul>
-          </p>
-
-        </div>
-
-        <div class="col-lg-6">
-          <h4>Ik ben een vader/moeder</h4>
-          <p>
-            <ul>
-              <li><a href="#" id="house-safety">Where is safer?</a></li>
-              <li><a href="#" id="house-cost">Where is less expensive?</a></li>
-              
-            </ul>
-          </p>
-
-          <h4>Subheading</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-          <h4>Subheading</h4>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-        </div>
-      </div>
+    
 
       <div class="footer">
         <p>&copy; Company 2014</p>
@@ -150,6 +124,8 @@
     <!-- <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-osm/v0.1.0/leaflet-osm.js'></script> -->
     <!-- Leaflet Omnivore plugin for topojson files -->
     <script src="leaflet/leaflet-omnivore/leaflet-omnivore.js"></script>
+    <!-- Heatmap -->
+    <script src="leaflet/leaflet-heat/leaflet-heat.js"></script>
     <!-- my code -->
     <script src="app.js"></script>
 

@@ -2,7 +2,9 @@
 var map;
 var markers = new Array();
 var currentQuery = '';
-var cdkLayer;
+var cdkLayer; //cdkLayer is the layer containing the buurten
+var hashtagLayer; //Layer with hashtags
+var heatMap; //HEatmap is the layer containing the heatmap
 
 $( document ).ready(function() {
 
@@ -44,7 +46,7 @@ $( document ).ready(function() {
 	// //Add the callbacks to load data from OSM API (Overpass)
 	// map.on('load', onMapMove);
 	// map.on('moveend', onMapMove);
-	map.on('moveend', loadQuery);
+	// map.on('moveend', loadQuery);
 
 	//Locate the user
 	locateUser();
@@ -158,7 +160,7 @@ function getBorders(){
 }
 
 function locateUser(){
-	    map.locate({setView: true, watch: true}) /* This will return map so you can do chaining */
+	    map.locate({setView: false, watch: false}) /* This will return map so you can do chaining */
         .on('locationfound', function(e){
         		
     		//Remove all markers
@@ -184,44 +186,13 @@ function locateUser(){
         });
 }
 
-function onMapMove(){
-	//Called when the map is moved
-	var bounds = map.getBounds(); //this is an object of type latLngBounds http://leafletjs.com/reference.html#latlngbounds
-	var minLat = bounds.getSouth();
-	var minLon = bounds.getWest();
-	var maxLat = bounds.getNorth();
-	var maxLon = bounds.getEast();
-	//Load from OSM API OverPass
-	var queryRecycling = 'http://overpass-api.de/api/interpreter?data=[out:json];node[amenity=recycling]('+ minLat +','+ minLon +','+ maxLat +','+ maxLon +');out;';
-	$.getJSON(queryRecycling, function(data){
-		//Debug
-		// console.log(data);
-
-		//Remove all markers
-		markers.forEach(function(entry){
-			// var marker = map.getLayer(entry);
-			map.removeLayer(entry);
-		});
-
-		for (var i = data.elements.length - 1; i >= 0; i--) {
-			e = data.elements[i]; //each "e" is a element returned from the query 
-			//The icon
-			 var greenIcon = L.AwesomeMarkers.icon({
-    			icon: 'recycle',
-    			prefix: 'fa', //use ony for font-awesome icon
-    			markerColor: 'green',
-    			iconColor: 'white'
-  			});
-			//The popup content
-			var popupContent = '<p>id: '+e.id+'<br>amenity:'+ e.tags.amenity+'</p>'
-  			var marker = L.marker([e.lat,e.lon], {icon: greenIcon}).addTo(map);
-  			markers[marker._leaflet_id] = marker;
-  			marker.bindPopup(popupContent);
-
-		};
-
-	});
-}
+$('#select-hashtag').change(function(event) {
+	if (hashtagLayer != null) {
+		map.removeLayer(hashtagLayer);
+	};
+	var hashtag = $(this).val();
+	loadHeatMap(hashtag);
+});
 
 $('#address').keyup(function(event) {
 	event.preventDefault();
@@ -241,6 +212,37 @@ $('#button-go').click(function(event) {
 	};
 });
 
+function eachLayer(layer) {
+    var feature = layer.toGeoJSON();
+    //TODO: this works for geoJSON data, but is not working for .csv data we have available
+    if (feature.properties && feature.properties.text) {
+        layer.bindPopup(feature.properties.text);
+    }
+}
+
+//The app is ready to load heatmaps, but for now it just loads
+function loadHeatMap (hashtag) {
+	filename = "./data/" + hashtag + ".csv";
+	hashtagLayer = omnivore.csv(filename, {
+    	latfield: 'geo_lat',
+    	lonfield: 'geo_lng',
+    	delimiter: ','
+	}) .on('ready', function() {
+        map.addLayer(hashtagLayer);
+        //For each layer execute a function. In this case bindpopup
+        hashtagLayer.eachLayer(eachLayer);
+    });
+
+
+	// console.log(csvlayer);
+	// gg = csvlayer.toGeoJSON();
+	// var latlngs2 = gg.getLatLngs();
+	// console.log(latlngs2);
+	// var latlngs = csvlayer.getLatLngs();
+	// console.log(latlngs);
+	// heat = L.heatLayer(latlngs, {radius: 25}).addTo(map);
+
+}
 
 function addr_search() {
 
@@ -292,75 +294,4 @@ function chooseAddr(lat, lng, type) {
 	}
 }
 
-function loadQuery(query){
-	baseUrl = 'http://api.citysdk.waag.org/admr.nl.amsterdam/';
-	var icon;
-	if (query=='bike-park') {
-		queryStr = baseUrl+'nodes?layer=divv.parking.bicycles&per_page=100';
-		icon = L.AwesomeMarkers.icon({
-		iconUrl: 'icons/bicycle.svg',
-		iconRetinaUrl: 'icons/bicycle@2x.svg',
-		markerColor: 'red',
-		iconColor: 'white'
-		});
-	}
-	else if(query=='car-park'){
-		queryStr = baseUrl+'nodes?layer=divv.parking.car&per_page=100';
-		icon = L.AwesomeMarkers.icon({
-		prefix: 'fa',
-		icon: 'fa-car',
-		markerColor: 'red',
-		iconColor: 'white'
-		});
-	}
-	else{
-		return false;
-	}
-	queryStr = queryStr + "&geom";
 
-	$.getJSON(queryStr, function(data){
-		//Debug
-		console.log(data);
-
-		//Remove all markers
-		markers.forEach(function(entry){
-			// var marker = map.getLayer(entry);
-			map.removeLayer(entry);
-		});
-
-		for (var i = data.results.length - 1; i >= 0; i--) {
-			result = data.results[i];
-			name = result.name;
-			coordinates = result.geom.coordinates;
-			var lat = coordinates[1];
-			var lon = coordinates[0];
-
-
-			//The popup content
-			var popupContent = '<p>'+result.name+'</p>'
-  			var marker = L.marker([lat, lon], {icon: icon}).addTo(map);
-  			markers[marker._leaflet_id] = marker;
-  			marker.bindPopup(popupContent);
-
-		};
-
-	});
-
-}
-
-//Buttons
-
-$('#car-park').click(function(event) {
-	//User tapped to get the bike parkings
-	event.preventDefault();
-	currentQuery = 'car-park';
-	loadQuery('car-park');
-});
-
-$('#bike-park').click(function(event) {
-	//User tapped to get the bike parkings
-	event.preventDefault();
-	currentQuery = 'bike-park';
-	loadQuery('bike-park');
-
-});
